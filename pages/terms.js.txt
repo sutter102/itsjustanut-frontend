@@ -1,0 +1,7 @@
+export default function Terms() {
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Terms of Service</h1>
+      <p>By accessing www.itsjustanut.com, you agree that you are over 18 and accept our terms...</p>
+    </div>
+  );
