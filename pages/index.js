@@ -38,4 +38,5 @@ export default function Home() {
     </div>
   );
 }
+import { useEffect, useState } from 'react';
 
