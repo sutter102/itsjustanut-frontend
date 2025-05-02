@@ -1,0 +1,8 @@
+export default function DMCA() {
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">DMCA Notice</h1>
+      <p>If you believe content violates your copyright, please email support@itsjustanut.com with proof of ownership...</p>
+    </div>
+  );
+}

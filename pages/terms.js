@@ -5,3 +5,4 @@ export default function Terms() {
       <p>By accessing www.itsjustanut.com, you agree that you are over 18 and accept our terms...</p>
     </div>
   );
+}
