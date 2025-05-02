@@ -1,4 +1,98 @@
+// BACKEND FILES FOR itsjustanut-backend (Node.js + Express + MongoDB)
+
+// === Folder Structure ===
+// itsjustanut-backend/
+// ├── server.js
+// ├── models/
+// │   └── Video.js
+// ├── routes/
+// │   └── api.js
+// ├── .env.example
+// └── package.json
+
+// === File: server.js ===
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const apiRoutes = require('./routes/api');
+
+dotenv.config();
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+app.use('/api', apiRoutes);
+
+// ✅ Add this route to fix "Cannot GET /" and display a welcome message
+app.get('/', (req, res) => {
+  res.send('🎉 Welcome to the ItsJustANut API! Use /api/videos to get your nut.');
+});
+
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => console.log('MongoDB connected')).catch(err => console.log(err));
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// === File: models/Video.js ===
+const mongoose = require('mongoose');
+
+const VideoSchema = new mongoose.Schema({
+  title: String,
+  url: String,
+  thumb: String,
+  category: String,
+  duration: String
+});
+
+module.exports = mongoose.model('Video', VideoSchema);
+
+// === File: routes/api.js ===
+const express = require('express');
+const router = express.Router();
+const Video = require('../models/Video');
+
+router.get('/videos', async (req, res) => {
+  const videos = await Video.find();
+  res.json(videos);
+});
+
+router.post('/videos', async (req, res) => {
+  const { title, url, thumb, category, duration } = req.body;
+  const video = new Video({ title, url, thumb, category, duration });
+  await video.save();
+  res.json(video);
+});
+
+module.exports = router;
+
+// === File: .env.example ===
+MONGO_URI=mongodb+srv://admin:<password>@cluster0.mongodb.net/itsjustanut?retryWrites=true&w=majority
+JWT_SECRET=supersecretkey
+FRONTEND_URL=https://itsjustanut-frontend.vercel.app
+
+// === File: package.json ===
+{
+  "name": "itsjustanut-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0"
+  }
+}
+
+// === FRONTEND HOMEPAGE FILE: pages/index.js ===
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 export default function Home() {
   const [videos, setVideos] = useState([]);
@@ -11,10 +105,15 @@ export default function Home() {
   }, []);
 
   return (
-    <div style={{ backgroundColor: '#0f0f0f', color: '#fff', fontFamily: 'Arial, sans-serif' }}>
-      <header style={{ backgroundColor: '#000', padding: '1rem 2rem', borderBottom: '2px solid #ff9800' }}>
+    <div style={{ backgroundColor: '#0f0f0f', color: '#fff', fontFamily: 'Arial, sans-serif', minHeight: '100vh' }}>
+      <header style={{ backgroundColor: '#000', padding: '1rem 2rem', borderBottom: '2px solid #ff9800', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 style={{ margin: 0, fontSize: '2rem', color: '#ff9800' }}>ItsJustANut</h1>
-        <p style={{ marginTop: '0.25rem', color: '#ccc' }}>Fast. Free. Filthy.</p>
+        <nav style={{ display: 'flex', gap: '1rem' }}>
+          <Link href="/">Home</Link>
+          <Link href="/upload">Upload</Link>
+          <Link href="/categories">Categories</Link>
+          <Link href="/about">About</Link>
+        </nav>
       </header>
 
       <section style={{ padding: '2rem' }}>
