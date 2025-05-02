@@ -1,0 +1,55 @@
+import { useState } from 'react';
+
+export default function Upload() {
+  const [form, setForm] = useState({
+    title: '',
+    url: '',
+    thumb: '',
+    category: '',
+    duration: ''
+  });
+
+  const [status, setStatus] = useState('');
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('Uploading...');
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+
+      if (res.ok) {
+        setStatus('✅ Upload successful!');
+        setForm({ title: '', url: '', thumb: '', category: '', duration: '' });
+      } else {
+        setStatus('❌ Upload failed.');
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus('❌ Server error.');
+    }
+  };
+
+  return (
+    <div style={{ background: '#111', color: 'white', minHeight: '100vh', padding: '2rem' }}>
+      <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Upload a Video</h1>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '500px' }}>
+        <input name="title" placeholder="Video Title" value={form.title} onChange={handleChange} required />
+        <input name="url" placeholder="Video URL" value={form.url} onChange={handleChange} required />
+        <input name="thumb" placeholder="Thumbnail URL" value={form.thumb} onChange={handleChange} required />
+        <input name="category" placeholder="Category" value={form.category} onChange={handleChange} />
+        <input name="duration" placeholder="Duration (e.g. 6:45)" value={form.duration} onChange={handleChange} />
+        <button type="submit">Submit</button>
+      </form>
+      {status && <p style={{ marginTop: '1rem' }}>{status}</p>}
+    </div>
+  );
+}
